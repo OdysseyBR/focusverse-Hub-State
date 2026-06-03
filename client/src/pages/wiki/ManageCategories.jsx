@@ -22,7 +22,7 @@ function EditRow({ cat, onSave, onDelete, onCancel }) {
 
 async function handleSave(id, data) {
     const { setDoc } = await import('firebase/firestore')
-    const { db } = await import('../lib/firebase')
+    const { db } = await import('../../firebase')
     await setDoc(doc(db, 'categories', id), { ...data, updatedAt: new Date() }, { merge: true })
     setEditingId(null)
   }

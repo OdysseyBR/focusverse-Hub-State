@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react'
 import { Plus, Trash2, Image, X, Loader, Settings } from 'lucide-react'
-import { uploadFile, validateImage } from '../lib/cloudinary'
-
+import { uploadImage, validateImage } from '../utils/cloudinary'
 const MAX_ROWS = 50
 const MAX_COLS = 10
 const MAX_LISTS = 10
