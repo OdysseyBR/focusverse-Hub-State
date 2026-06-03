@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TimeLine Focus</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #080808; color: #e0e0e0; min-height: 100vh; }
+
+    /* LOGIN */
+    #tela-login {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; height: 100vh; gap: 12px;
+      background: radial-gradient(ellipse at 50% 0%, #1a0a2e 0%, #080808 70%);
+    }
+    #tela-login .logo-wrap { margin-bottom: 16px; }
+    #tela-login .logo-wrap svg { width: 190px; height: 190px; opacity: 0.95; }
+    #tela-login h1 { font-size: 1.8rem; font-weight: 700; color: #ffffff; letter-spacing: -0.03em; }
+    #tela-login p { color: #555; font-size: 0.9rem; margin-bottom: 20px; }
+
+    .login-btns { display: flex; flex-direction: column; gap: 10px; width: 280px; }
+
+    .btn-login-google, .btn-login-github {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 12px 20px; border-radius: 10px; font-size: 0.9rem;
+      font-weight: 500; cursor: pointer; border: none; transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-login-google {
+      background: #ffffff; color: #111;
+    }
+    .btn-login-google:hover { background: #f0f0f0; transform: translateY(-1px); }
+    .btn-login-github {
+      background: #161b22; color: #fff; border: 1px solid #30363d;
+    }
+    .btn-login-github:hover { background: #21262d; transform: translateY(-1px); }
+
+    .divider {
+      display: flex; align-items: center; gap: 10px;
+      color: #333; font-size: 0.78rem; width: 280px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: #222;
+    }
+
+    /* HEADER */
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 32px; background: #0d0d0d;
+      border-bottom: 1px solid #1a1a1a; position: sticky; top: 0; z-index: 10;
+    }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .header-left svg { width: 28px; height: 28px; }
+    header h1 { font-size: 1rem; font-weight: 600; color: #fff; letter-spacing: -0.02em; }
+
+    #btn-logout {
+      background: transparent; color: #555; border: 1px solid #222;
+      padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;
+      font-family: 'Inter', sans-serif; transition: all 0.2s;
+    }
+    #btn-logout:hover { color: #fff; border-color: #444; }
+
+    /* CONTEÚDO */
+    #conteudo { max-width: 720px; margin: 48px auto; padding: 0 20px; }
+
+    #btn-novo {
+      background: #7c3aed; color: #fff; border: none; padding: 10px 20px;
+      border-radius: 10px; font-size: 0.88rem; cursor: pointer; font-weight: 600;
+      margin-bottom: 36px; font-family: 'Inter', sans-serif; transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    #btn-novo:hover { background: #6d28d9; transform: translateY(-1px); }
+
+    /* FORMULÁRIO */
+    #formulario {
+      background: #0f0f0f; border: 1px solid #1e1e1e; border-radius: 16px;
+      padding: 28px; margin-bottom: 36px; display: none; flex-direction: column; gap: 14px;
+    }
+    #formulario h2 { color: #fff; font-size: 1rem; font-weight: 600; }
+
+    .campo-grupo { display: flex; flex-direction: column; gap: 6px; }
+    .campo-grupo label { font-size: 0.75rem; color: #555; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    #formulario input, #formulario textarea {
+      background: #080808; border: 1px solid #222; color: #e0e0e0;
+      padding: 10px 14px; border-radius: 10px; font-size: 0.9rem; width: 100%;
+      font-family: 'Inter', sans-serif; transition: border-color 0.2s;
+    }
+    #formulario input:focus, #formulario textarea:focus {
+      outline: none; border-color: #7c3aed;
+    }
+    #formulario textarea { min-height: 110px; resize: vertical; }
+
+    .form-botoes { display: flex; gap: 10px; padding-top: 4px; }
+    #btn-salvar {
+      background: #7c3aed; color: #fff; border: none; padding: 10px 22px;
+      border-radius: 10px; cursor: pointer; font-weight: 600; font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    #btn-salvar:hover { background: #6d28d9; }
+    #btn-cancelar {
+      background: transparent; color: #555; border: 1px solid #222;
+      padding: 10px 22px; border-radius: 10px; cursor: pointer; font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    #btn-cancelar:hover { color: #fff; border-color: #444; }
+
+    /* LISTA */
+    #lista { display: flex; flex-direction: column; gap: 12px; }
+
+    .evento {
+      background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 16px;
+      padding: 22px 26px; transition: border-color 0.2s;
+    }
+    .evento:hover { border-color: #2a2a2a; }
+
+    .evento-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .evento-info { flex: 1; }
+    .evento-data {
+      font-size: 0.72rem; color: #7c3aed; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
+    }
+    .evento-titulo { font-size: 1.05rem; color: #fff; font-weight: 600; margin-bottom: 10px; letter-spacing: -0.01em; }
+    .evento-descricao { font-size: 0.88rem; color: #666; line-height: 1.7; }
+
+    .evento-botoes { display: flex; gap: 6px; flex-shrink: 0; }
+    .btn-editar {
+      background: transparent; color: #444; border: 1px solid #1e1e1e;
+      padding: 5px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem;
+      font-family: 'Inter', sans-serif; transition: all 0.2s;
+    }
+    .btn-editar:hover { color: #fff; border-color: #444; }
+    .btn-deletar {
+      background: transparent; color: #6b2020; border: 1px solid #2a1010;
+      padding: 5px 12px; border-radius: 8px; cursor: pointer; font-size: 0.78rem;
+      font-family: 'Inter', sans-serif; transition: all 0.2s;
+    }
+    .btn-deletar:hover { background: #2a1010; color: #ff6b6b; }
+
+    #vazio {
+      color: #333; text-align: center; margin-top: 80px; font-size: 0.9rem;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+    }
+    #vazio span { font-size: 2rem; }
+    #carregando { color: #333; text-align: center; margin-top: 80px; font-size: 0.88rem; }
+  </style>
+</head>
+<body>
+
+<!-- TELA DE LOGIN -->
+<div id="tela-login">
+  <div class="logo-wrap">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 2000">
+      <path fill="#f2f4f4" fill-rule="evenodd" d="M332,668c56.361-2.241,68.22,57.963,26,73-39.165,13.949-73.6-27.207-50-59C313.668,674.365,322.872,672.392,332,668Zm945,0c56.36-2.241,68.22,57.963,26,73-39.16,13.949-73.6-27.207-50-59C1258.67,674.365,1267.87,672.392,1277,668Zm-156,18h86v323h-86V686ZM120,719h86v50h64v74H206c-1.533,62.059.236,103.474,65,91,0.245,13.031,2.956,72.43-2,78-26.1,13.7-72.821,1.7-91-9C101.806,958.15,119.431,837.271,120,719Zm689,290H728c0.558-37.192,7.854-133.308-7-155-5.558-8.117-20.843-16.13-37-13-43.363,8.4-29.741,115.007-29,168H574c0.54-35.54,6.734-120.563-3-147-4.67-12.682-19.185-25.034-40-21-43.607,8.45-29.75,114.867-29,168H421c-1.37-112.562-12.047-205.773,69-239,19.812-8.122,52.926-12.485,79-6,18.151,4.515,31.906,12.755,45,22,12.849-7.385,24.782-16.5,41-21,24.227-6.722,58.273-4.294,79,3C822.046,798.986,809.637,892.634,809,1009ZM954,761c74.66-1.105,137.21,39.25,139,108L926,919l4,4c3.558,7.32,10.981,10.017,19,13,31.333,11.656,52.91-6.174,73-16q19.5,31,39,62-12.495,9-25,18c-16.28,9.56-36.83,13.54-59,17-109.72,17.1-173.526-113-120-200,14.456-23.5,39.982-42.237,69-51Zm666,248h-86c0.85-58.735,18.33-180.486-50-168-52.25,9.547-36.8,107.44-36,168h-83c-1.26-121.953-9.13-213.58,86-242,22.8-6.811,58.73-8.4,83-1C1628.68,794.866,1620.74,887,1620,1009Zm145-248c74.66-1.105,137.21,39.25,139,108l-167,50c1.33,1.333,2.67,2.667,4,4,3.56,7.32,10.98,10.017,19,13,31.33,11.656,52.91-6.174,73-16q19.5,31,39,62-12.495,9-25,18c-16.28,9.56-36.83,13.54-59,17-109.72,17.1-173.53-113-120-200,14.46-23.5,39.98-42.237,69-51ZM299,769h86v240H299V769Zm945,0h86v240h-86V769ZM963,833c-25.708,10.449-38.608,13.5-45,43l89-26-6-7C989.191,838.341,980.733,833.124,963,833Zm811,0c-25.71,10.449-38.61,13.5-45,43q44.49-13,89-26l-6-7C1800.19,838.341,1791.73,833.124,1774,833Zm-123,232c38.01-.68,49.26,14.79,65,36-0.67,1-1.33,2-2,3q-7.995,4.5-16,9c-17.94-36.72-95.42-28.46-81,15,12.88,38.83,121.28,28.97,108,97-12.04,61.66-128.94,69.21-141,11q8.505-6,17-12h1c14.88,37.45,108.63,38.31,100-9-8.88-48.65-122.8-35-108-102,3.38-15.32,8.52-26.16,19-34C1624.08,1070.71,1636.48,1070.97,1651,1065Zm-1008,1c148.82-2.67,154.708,187.99,23,210-68.964,11.53-132.786-63.63-112-133,9.6-32.04,32.5-57.88,62-70Q629.5,1069.505,643,1066Zm372,0c42.01-.94,60.55,12.56,83,30l-3,3q-4.995,7.5-10,15l-3-3c-12.07-5.94-21.08-15.85-36-20-55.392-15.41-92.7,29.51-100,71-8.2,46.55,41.786,98.9,87,91,23.49-4.1,35.9-13.39,51-25l14,17q-4.005,4.5-8,9c-16.87,7.79-29.08,18.25-52,22-75.365,12.33-137.392-73.66-108-145,10.472-25.41,32.531-47.58,58-58Q1001.5,1069.505,1015,1066Zm-741,2H394v23H297v68h84v23H297v91H274V1068Zm990,1h23c-0.85,66.44-16.81,195.81,57,184,66.32-10.61,49.85-108.65,49-184h23c0.93,84.06,14.21,170.08-43,199-9.63,4.87-25.32,10.99-42,8C1246.4,1260.83,1263.14,1166.09,1264,1069Zm-617,20c-34.516,14-58.823,21.6-70,58-17.7,57.64,34.819,117.43,93,105C765.793,1231.54,758.868,1087.08,647,1089Z"/>
+    </svg>
+  </div>
+  <h1>Bem-Vindo!</h1>
+  <p>Seus acontecimentos organizados.</p>
+  <div class="login-btns">
+    <button class="btn-login-google" id="btn-login-google">
+      <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Continuar com Google
+    </button>
+    <div class="divider">ou</div>
+    <button class="btn-login-github" id="btn-login-github">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      Continuar com GitHub
+    </button>
+  </div>
+</div>
+
+<!-- TELA PRINCIPAL -->
+<div id="tela-app" style="display:none;">
+  <header>
+    <div class="header-left">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 2000">
+        <path fill="#f2f4f4" fill-rule="evenodd" d="M332,668c56.361-2.241,68.22,57.963,26,73-39.165,13.949-73.6-27.207-50-59C313.668,674.365,322.872,672.392,332,668Zm945,0c56.36-2.241,68.22,57.963,26,73-39.16,13.949-73.6-27.207-50-59C1258.67,674.365,1267.87,672.392,1277,668Zm-156,18h86v323h-86V686ZM120,719h86v50h64v74H206c-1.533,62.059.236,103.474,65,91,0.245,13.031,2.956,72.43-2,78-26.1,13.7-72.821,1.7-91-9C101.806,958.15,119.431,837.271,120,719Zm689,290H728c0.558-37.192,7.854-133.308-7-155-5.558-8.117-20.843-16.13-37-13-43.363,8.4-29.741,115.007-29,168H574c0.54-35.54,6.734-120.563-3-147-4.67-12.682-19.185-25.034-40-21-43.607,8.45-29.75,114.867-29,168H421c-1.37-112.562-12.047-205.773,69-239,19.812-8.122,52.926-12.485,79-6,18.151,4.515,31.906,12.755,45,22,12.849-7.385,24.782-16.5,41-21,24.227-6.722,58.273-4.294,79,3C822.046,798.986,809.637,892.634,809,1009ZM954,761c74.66-1.105,137.21,39.25,139,108L926,919l4,4c3.558,7.32,10.981,10.017,19,13,31.333,11.656,52.91-6.174,73-16q19.5,31,39,62-12.495,9-25,18c-16.28,9.56-36.83,13.54-59,17-109.72,17.1-173.526-113-120-200,14.456-23.5,39.982-42.237,69-51Zm666,248h-86c0.85-58.735,18.33-180.486-50-168-52.25,9.547-36.8,107.44-36,168h-83c-1.26-121.953-9.13-213.58,86-242,22.8-6.811,58.73-8.4,83-1C1628.68,794.866,1620.74,887,1620,1009Zm145-248c74.66-1.105,137.21,39.25,139,108l-167,50c1.33,1.333,2.67,2.667,4,4,3.56,7.32,10.98,10.017,19,13,31.33,11.656,52.91-6.174,73-16q19.5,31,39,62-12.495,9-25,18c-16.28,9.56-36.83,13.54-59,17-109.72,17.1-173.53-113-120-200,14.46-23.5,39.98-42.237,69-51ZM299,769h86v240H299V769Zm945,0h86v240h-86V769ZM963,833c-25.708,10.449-38.608,13.5-45,43l89-26-6-7C989.191,838.341,980.733,833.124,963,833Zm811,0c-25.71,10.449-38.61,13.5-45,43q44.49-13,89-26l-6-7C1800.19,838.341,1791.73,833.124,1774,833Zm-123,232c38.01-.68,49.26,14.79,65,36-0.67,1-1.33,2-2,3q-7.995,4.5-16,9c-17.94-36.72-95.42-28.46-81,15,12.88,38.83,121.28,28.97,108,97-12.04,61.66-128.94,69.21-141,11q8.505-6,17-12h1c14.88,37.45,108.63,38.31,100-9-8.88-48.65-122.8-35-108-102,3.38-15.32,8.52-26.16,19-34C1624.08,1070.71,1636.48,1070.97,1651,1065Zm-1008,1c148.82-2.67,154.708,187.99,23,210-68.964,11.53-132.786-63.63-112-133,9.6-32.04,32.5-57.88,62-70Q629.5,1069.505,643,1066Zm372,0c42.01-.94,60.55,12.56,83,30l-3,3q-4.995,7.5-10,15l-3-3c-12.07-5.94-21.08-15.85-36-20-55.392-15.41-92.7,29.51-100,71-8.2,46.55,41.786,98.9,87,91,23.49-4.1,35.9-13.39,51-25l14,17q-4.005,4.5-8,9c-16.87,7.79-29.08,18.25-52,22-75.365,12.33-137.392-73.66-108-145,10.472-25.41,32.531-47.58,58-58Q1001.5,1069.505,1015,1066Zm-741,2H394v23H297v68h84v23H297v91H274V1068Zm990,1h23c-0.85,66.44-16.81,195.81,57,184,66.32-10.61,49.85-108.65,49-184h23c0.93,84.06,14.21,170.08-43,199-9.63,4.87-25.32,10.99-42,8C1246.4,1260.83,1263.14,1166.09,1264,1069Zm-617,20c-34.516,14-58.823,21.6-70,58-17.7,57.64,34.819,117.43,93,105C765.793,1231.54,758.868,1087.08,647,1089Z"/>
+      </svg>
+      <h1>TimeLine Focus</h1>
+    </div>
+    <button id="btn-logout">Sair</button>
+  </header>
+
+  <div id="conteudo">
+    <div style="display:flex; gap:10px; margin-bottom:36px; flex-wrap:wrap;">
+      <button id="btn-novo" style="margin-bottom:0;">+ Novo acontecimento</button>
+      <button id="btn-export-pdf" style="background:#1a1a1a;color:#aaa;border:1px solid #222;padding:10px 20px;border-radius:10px;font-size:0.88rem;cursor:pointer;font-weight:500;font-family:'Inter',sans-serif;transition:all 0.2s;">↓ Exportar PDF</button>
+      <button id="btn-export-txt" style="background:#1a1a1a;color:#aaa;border:1px solid #222;padding:10px 20px;border-radius:10px;font-size:0.88rem;cursor:pointer;font-weight:500;font-family:'Inter',sans-serif;transition:all 0.2s;">↓ Exportar TXT</button>
+    </div>
+
+    <div id="formulario">
+      <h2 id="form-titulo">Novo acontecimento</h2>
+      <div class="campo-grupo">
+        <label>Data</label>
+        <input id="campo-data" type="text" placeholder="Ex: Ano 1, Século XV, 2024, 15/03/2024..." />
+      </div>
+      <div class="campo-grupo">
+        <label>Título</label>
+        <input id="campo-titulo" type="text" placeholder="Título do acontecimento" />
+      </div>
+      <div class="campo-grupo">
+        <label>Descrição</label>
+        <textarea id="campo-descricao" placeholder="Descreva o acontecimento..."></textarea>
+      </div>
+      <div class="form-botoes">
+        <button id="btn-salvar">Salvar</button>
+        <button id="btn-cancelar">Cancelar</button>
+      </div>
+    </div>
+
+    <div id="lista">
+      <div id="carregando">Carregando...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, onAuthStateChanged, signOut }
+    from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDoGuZpbW5IBLlbsjfjLJWfk1z79A4qvV8",
+    authDomain: "focus-tl.firebaseapp.com",
+    projectId: "focus-tl",
+    storageBucket: "focus-tl.firebasestorage.app",
+    messagingSenderId: "35680912747",
+    appId: "1:35680912747:web:6d621434b9c2ef97d3382e"
+  };
+
+  const firebaseApp = initializeApp(firebaseConfig);
+  const auth = getAuth(firebaseApp);
+  const googleProvider = new GoogleAuthProvider();
+  const githubProvider = new GithubAuthProvider();
+
+  let tokenAtual = null;
+  let editandoId = null;
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      tokenAtual = await user.getIdToken();
+      document.getElementById('tela-login').style.display = 'none';
+      document.getElementById('tela-app').style.display = 'block';
+      carregarEventos();
+    } else {
+      document.getElementById('tela-login').style.display = 'flex';
+      document.getElementById('tela-app').style.display = 'none';
+    }
+  });
+
+  document.getElementById('btn-login-google').addEventListener('click', () => {
+    signInWithPopup(auth, googleProvider).catch(console.error);
+  });
+
+  document.getElementById('btn-login-github').addEventListener('click', () => {
+    signInWithPopup(auth, githubProvider).catch(console.error);
+  });
+
+  document.getElementById('btn-logout').addEventListener('click', () => {
+    signOut(auth);
+  });
+
+  document.getElementById('btn-novo').addEventListener('click', () => {
+    editandoId = null;
+    document.getElementById('form-titulo').textContent = 'Novo acontecimento';
+    document.getElementById('campo-data').value = '';
+    document.getElementById('campo-titulo').value = '';
+    document.getElementById('campo-descricao').value = '';
+    document.getElementById('formulario').style.display = 'flex';
+    document.getElementById('formulario').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  document.getElementById('btn-cancelar').addEventListener('click', () => {
+    document.getElementById('formulario').style.display = 'none';
+    editandoId = null;
+  });
+
+  document.getElementById('btn-salvar').addEventListener('click', async () => {
+    const data = document.getElementById('campo-data').value.trim();
+    const titulo = document.getElementById('campo-titulo').value.trim();
+    const descricao = document.getElementById('campo-descricao').value.trim();
+
+    if (!data || !titulo || !descricao) {
+      alert('Preencha todos os campos!');
+      return;
+    }
+
+    const url = editandoId ? `/api/eventos/${editandoId}` : '/api/eventos';
+    const method = editandoId ? 'PUT' : 'POST';
+
+    await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${tokenAtual}`
+      },
+      body: JSON.stringify({ data, titulo, descricao })
+    });
+
+    document.getElementById('formulario').style.display = 'none';
+    editandoId = null;
+    carregarEventos();
+  });
+
+  async function carregarEventos() {
+    const res = await fetch('/api/eventos', {
+      headers: { 'Authorization': `Bearer ${tokenAtual}` }
+    });
+    const eventos = await res.json();
+    const lista = document.getElementById('lista');
+
+    if (eventos.length === 0) {
+      lista.innerHTML = '<div id="vazio"><span>📭</span>Nenhum acontecimento ainda. Crie o primeiro!</div>';
+      return;
+    }
+
+    lista.innerHTML = eventos.map(e => `
+      <div class="evento">
+        <div class="evento-header">
+          <div class="evento-info">
+            <div class="evento-data">${e.data}</div>
+            <div class="evento-titulo">${e.titulo}</div>
+            <div class="evento-descricao">${e.descricao}</div>
+          </div>
+          <div class="evento-botoes">
+            <button class="btn-editar" onclick="editar('${e.id}', \`${e.data}\`, \`${e.titulo}\`, \`${e.descricao}\`)">Editar</button>
+            <button class="btn-deletar" onclick="deletar('${e.id}')">Excluir</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.editar = (id, data, titulo, descricao) => {
+    editandoId = id;
+    document.getElementById('form-titulo').textContent = 'Editar acontecimento';
+    document.getElementById('campo-data').value = data;
+    document.getElementById('campo-titulo').value = titulo;
+    document.getElementById('campo-descricao').value = descricao;
+    document.getElementById('formulario').style.display = 'flex';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+// Exportar TXT
+  document.getElementById('btn-export-txt').addEventListener('click', async () => {
+    const res = await fetch('/api/eventos', {
+      headers: { 'Authorization': `Bearer ${tokenAtual}` }
+    });
+    const eventos = await res.json();
+
+    if (eventos.length === 0) {
+      alert('Nenhum acontecimento para exportar!');
+      return;
+    }
+
+    const linhas = eventos.map(e =>
+      `DATA: ${e.data}\nTÍTULO: ${e.titulo}\nDESCRIÇÃO: ${e.descricao}\n${'─'.repeat(50)}`
+    ).join('\n\n');
+
+    const conteudo = `Arquivo TimeLine Focus\nExportado em: ${new Date().toLocaleDateString('pt-BR')}\n${'═'.repeat(50)}\n\n${linhas}`;
+    const blob = new Blob([conteudo], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'linha-do-tempo.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // Exportar PDF
+  document.getElementById('btn-export-pdf').addEventListener('click', async () => {
+    const res = await fetch('/api/eventos', {
+      headers: { 'Authorization': `Bearer ${tokenAtual}` }
+    });
+    const eventos = await res.json();
+
+    if (eventos.length === 0) {
+      alert('Nenhum acontecimento para exportar!');
+      return;
+    }
+
+    const janela = window.open('', '_blank');
+    janela.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>TimeLine Focus</title>
+        <style>
+          body { font-family: 'Georgia', serif; max-width: 800px; margin: 40px auto; color: #111; padding: 0 20px; }
+          h1 { font-size: 2rem; border-bottom: 2px solid #111; padding-bottom: 12px; margin-bottom: 6px; }
+          .data-export { color: #888; font-size: 0.85rem; margin-bottom: 40px; }
+          .evento { margin-bottom: 36px; padding-bottom: 36px; border-bottom: 1px solid #ddd; }
+          .evento:last-child { border-bottom: none; }
+          .evento-data { font-size: 0.75rem; color: #7c3aed; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+          .evento-titulo { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; }
+          .evento-descricao { font-size: 0.95rem; color: #444; line-height: 1.8; }
+        </style>
+      </head>
+      <body>
+        <h1>Lista Exportada do TimeLine Focus</h1>
+        <div class="data-export">Exportado em ${new Date().toLocaleDateString('pt-BR')}</div>
+        ${eventos.map(e => `
+          <div class="evento">
+            <div class="evento-data">${e.data}</div>
+            <div class="evento-titulo">${e.titulo}</div>
+            <div class="evento-descricao">${e.descricao}</div>
+          </div>
+        `).join('')}
+      </body>
+      </html>
+    `);
+    janela.document.close();
+    setTimeout(() => janela.print(), 500);
+  });
+  
+  window.deletar = async (id) => {
+    if (!confirm('Tem certeza que quer excluir este acontecimento?')) return;
+    await fetch(`/api/eventos/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${tokenAtual}` }
+    });
+    carregarEventos();
+  };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Config / Theme — só admin pode escrever
+    match /config/{doc} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.email == 'dev.lucas.rafael@gmail.com';
+    }
+
+    // Articles — leitura autenticada, escrita só admin
+    match /articles/{articleId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.email == 'dev.lucas.rafael@gmail.com';
+    }
+
+    // Categories — leitura autenticada, escrita só admin
+    match /categories/{catId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.email == 'dev.lucas.rafael@gmail.com';
+    }
+
+    // Dados por usuário (eventos, territórios, etc.) — acesso próprio
+    match /usuarios/{userId}/{collection}/{docId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // API keys do mapa
+    match /apikeys/{keyId} {
+      allow read, write: if request.auth != null && request.auth.token.email == 'dev.lucas.rafael@gmail.com';
+    }
+  }
+}
